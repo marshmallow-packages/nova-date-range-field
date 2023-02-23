@@ -1,6 +1,6 @@
 <template>
     <DefaultField
-        :field="field"
+        :field="currentField"
         :errors="errors"
         :show-help-text="showHelpText"
         :full-width-content="fullWidthContent"
@@ -8,22 +8,26 @@
         <template #field>
             <date-range-picker
                 class="w-full form-control form-input form-input-bordered"
-                :id="field.attribute"
-                :name="field.name"
-                :field="field"
+                :id="currentField.attribute"
+                :name="currentField.name"
+                :field="currentField"
                 :value="value"
                 @change="handleChange"
             />
+
+            <p v-if="hasError" class="my-2 text-danger">
+                {{ firstError }}
+            </p>
         </template>
     </DefaultField>
 </template>
 
 <script>
-    import { FormField, HandlesValidationErrors } from "laravel-nova";
+    import { DependentFormField, HandlesValidationErrors } from "laravel-nova";
     import DateRangePicker from "./DateRangePicker";
 
     export default {
-        mixins: [FormField, HandlesValidationErrors],
+        mixins: [DependentFormField, HandlesValidationErrors],
 
         components: { DateRangePicker },
         props: ["resourceName", "resourceId", "field"],
@@ -38,7 +42,7 @@
              * Set the initial, internal value for the field.
              */
             setInitialValue() {
-                this.value = this.field.value || "";
+                this.value = this.currentField.value || "";
             },
 
             /**

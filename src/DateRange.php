@@ -6,9 +6,12 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Laravel\Nova\Fields\Field;
 use Laravel\Nova\Http\Requests\NovaRequest;
+use Laravel\Nova\Fields\SupportsDependentFields;
 
 class DateRange extends Field
 {
+    use SupportsDependentFields;
+
     /**
      * The field's component.
      *
@@ -129,7 +132,7 @@ class DateRange extends Field
             } else {
                 $model->{$this->till_field} = null;
             }
-        } else {
+        } elseif (isset($model->{$attribute})) {
             if ($valid_range) {
                 $saveAsJson = true;
             }
