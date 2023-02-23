@@ -38,14 +38,14 @@ Other field options (with their default values) are:
 
 ```php
     ->modeType('range')
-    ->range()
-    ->single()
-    ->twelveHourTime()
-    ->enableSeconds()
+    ->range() // Default mode
+    ->single() // default is disabled
+    ->twelveHourTime() // default is disabled
+    ->enableSeconds() // default is disabled
     ->separator('-')
     ->firstDayOfWeek(1)
-    ->enableTime()
+    ->enableTime() // default is disabled
     ->dateFormat('Y-m-d')
     ->placeholder('date range')
-    ->saveAsJSON()
+    ->saveAsJSON() // default is disabled
 ```
