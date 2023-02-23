@@ -9,7 +9,8 @@ Run this command in your nova project:
 
 ### How to use
 
-Use DateRange Field class and define the name of the (from & till) fields and the label. If no fields are set the string value will be stored in the corresponding database column of the attribute.
+Use the (dependend) DateRange Field class and define the name of the (from & till) fields and the label.
+If no fields are set the string value will be stored in the corresponding database column of the attribute.
 
 ```php
     use Marshmallow\NovaDateRangeField\DateRange;
