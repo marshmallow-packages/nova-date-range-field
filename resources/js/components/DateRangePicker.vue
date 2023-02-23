@@ -16,7 +16,9 @@
             const self = this;
 
             this.$nextTick(() => {
-                let options = {
+                let fieldOptions = this.options;
+
+                let setOptions = {
                     onClose: this.onChange,
                     enableTime: this.enableTime,
                     enableSeconds: this.enableSeconds,
@@ -33,6 +35,11 @@
                         rangeSeparator: ` ${this.separator} `,
                         firstDayOfWeek: this.firstDayOfWeek,
                     },
+                };
+
+                let options = {
+                    ...setOptions,
+                    ...fieldOptions,
                 };
 
                 this.flatpickr = flatpickr(this.$refs.dateRangePicker, options);
@@ -103,6 +110,9 @@
             },
             firstDayOfWeek() {
                 return this.field.firstDayOfWeek || 1;
+            },
+            options() {
+                return this.field.options;
             },
             timezone() {
                 return Nova.config("userTimezone") || Nova.config("timezone");

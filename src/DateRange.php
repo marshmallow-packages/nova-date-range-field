@@ -20,6 +20,7 @@ class DateRange extends Field
 
     public $from_field;
     public $till_field;
+    public $options;
 
     /**
      * Resolve the field's value.
@@ -137,6 +138,19 @@ class DateRange extends Field
         return false;
     }
 
+    public function getOptions()
+    {
+        if ($this->options) {
+            return $this->options;
+        }
+
+        return [
+            'weekNumbers' => true,
+            'defaultHour' => 0,
+            'defaultMinute' => 0,
+        ];
+    }
+
     public function saveAsJSON($saveAsJSON = true)
     {
         $this->saveAsJSON = $saveAsJSON;
@@ -148,6 +162,11 @@ class DateRange extends Field
         $this->from_field = $from;
         $this->till_field = $till;
         return $this;
+    }
+
+    public function options(array $options)
+    {
+        $this->options = $options;
     }
 
     public function modeType($mode = 'range')
@@ -208,5 +227,24 @@ class DateRange extends Field
     {
         $this->withMeta(['placeholder' => $placeholder]);
         return $this;
+    }
+
+
+    /**
+     * Prepare the element for JSON serialization.
+     *
+     * @return array<string, mixed>
+     */
+    public function jsonSerialize(): array
+    {
+        $request = app(NovaRequest::class);
+
+        if ($request->isFormRequest()) {
+            return array_merge(parent::jsonSerialize(), [
+                'options' => $this->getOptions(),
+            ]);
+        }
+
+        return (parent::jsonSerialize());
     }
 }
