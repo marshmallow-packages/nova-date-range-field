@@ -1,45 +1,75 @@
 <template>
-  <DefaultField
-    :field="field"
-    :errors="errors"
-    :show-help-text="showHelpText"
-    :full-width-content="fullWidthContent"
-  >
-    <template #field>
-      <input
-        :id="field.attribute"
-        type="text"
-        class="w-full form-control form-input form-input-bordered"
-        :class="errorClasses"
-        :placeholder="field.name"
-        v-model="value"
-      />
-    </template>
-  </DefaultField>
+    <DefaultField
+        :field="field"
+        :errors="errors"
+        :show-help-text="showHelpText"
+        :full-width-content="fullWidthContent"
+    >
+        <template #field>
+            <date-range-picker
+                class="w-full form-control form-input form-input-bordered"
+                :id="field.attribute"
+                :name="field.name"
+                :field="field"
+                :value="value"
+                @change="handleChange"
+            />
+        </template>
+    </DefaultField>
 </template>
 
 <script>
-import { FormField, HandlesValidationErrors } from 'laravel-nova'
+    import { FormField, HandlesValidationErrors } from "laravel-nova";
+    import DateRangePicker from "./DateRangePicker";
 
-export default {
-  mixins: [FormField, HandlesValidationErrors],
+    export default {
+        mixins: [FormField, HandlesValidationErrors],
 
-  props: ['resourceName', 'resourceId', 'field'],
+        components: { DateRangePicker },
+        props: ["resourceName", "resourceId", "field"],
 
-  methods: {
-    /*
-     * Set the initial, internal value for the field.
-     */
-    setInitialValue() {
-      this.value = this.field.value || ''
-    },
+        data: () => ({
+            formattedDates: [],
+            date_values: [],
+        }),
 
-    /**
-     * Fill the given FormData object with the field's internal value.
-     */
-    fill(formData) {
-      formData.append(this.field.attribute, this.value || '')
-    },
-  },
-}
+        methods: {
+            /*
+             * Set the initial, internal value for the field.
+             */
+            setInitialValue() {
+                this.value = this.field.value || "";
+            },
+
+            /**
+             * Update the field's internal value
+             */
+            handleChange(event) {
+                let value = event?.target?.value ?? event;
+
+                if (event?.date_values) {
+                    this.date_values = event?.date_values;
+                } else {
+                    this.value = value;
+                }
+
+                if (this.field) {
+                    this.emitFieldValueChange(this.field.attribute, this.value);
+                }
+            },
+
+            /**
+             * Fill the given FormData object with the field's internal value.
+             */
+            fill(formData) {
+                let values = this.value || "";
+
+                if (this.date_values.length) {
+                    values = this.date_values;
+                }
+
+                formData.append(this.field.attribute, values);
+            },
+        },
+    };
 </script>
