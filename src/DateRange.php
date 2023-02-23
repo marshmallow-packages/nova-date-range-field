@@ -205,9 +205,9 @@ class DateRange extends Field
         return $this;
     }
 
-    public function firstDayOfWeek()
+    public function firstDayOfWeek($day = 1)
     {
-        $this->withMeta(['firstDayOfWeek' => 1]);
+        $this->withMeta(['firstDayOfWeek' => $day]);
         return $this;
     }
 
