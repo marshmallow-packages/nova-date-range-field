@@ -17,10 +17,35 @@ class DateRange extends Field
     public $component = 'nova-date-range-field';
 
     protected $saveAsJSON = false;
+    public $fields_set = false;
 
     public $from_field;
     public $till_field;
     public $options;
+
+
+    public function __construct($name, $attribute = null, callable $resolveCallback = null)
+    {
+        if (is_array($name)) {
+            $name = implode('-', $name);
+        }
+        if (is_array($attribute)) {
+            $attribute = implode('-', $attribute);
+        }
+
+        parent::__construct($name, $attribute, $resolveCallback);
+    }
+
+    /**
+     * Parse the attribute name to retrieve the affected model attributes
+     *
+     * @param $attribute
+     * @return array
+     */
+    protected function parseAttribute($attribute)
+    {
+        return explode('-', $attribute);
+    }
 
     /**
      * Resolve the field's value.
@@ -29,19 +54,15 @@ class DateRange extends Field
      * @param  string|null  $attribute
      * @return void
      */
-    public function resolve($resource, $attribute = null)
+    public function resolveAttribute($resource, $attribute)
     {
-        $this->resource = $resource;
+        if (!$this->fields_set) {
+            [$this->from_field, $this->till_field] = $this->parseAttribute($attribute);
+        }
 
         $attribute = $attribute ?? $this->attribute;
 
-        if ($attribute === 'ComputedField') {
-            $this->value = call_user_func($this->computedCallback, $resource);
-
-            return;
-        }
-
-        if (!$this->resolveCallback && $this->from_field && $this->till_field) {
+        if ($this->from_field && $this->till_field) {
             $separator = $this->meta['separator'] ?? '-';
             $time_enabled = $this->meta['enableTime'] ?? true;
             $format = $this->meta['format'] ??  ($time_enabled ? "Y-m-d H:i" : "Y-m-d");
@@ -58,16 +79,7 @@ class DateRange extends Field
                 $value .= Carbon::parse($till_value)->format($format);
             }
 
-            $this->value = $value ?? null;
-            return;
-        }
-
-        if (!$this->resolveCallback) {
-            $this->value = $this->resolveAttribute($resource, $attribute);
-        } elseif (is_callable($this->resolveCallback)) {
-            tap($this->resolveAttribute($resource, $attribute), function ($value) use ($resource, $attribute) {
-                $this->value = call_user_func($this->resolveCallback, $value, $resource, $attribute);
-            });
+            return $value ?? null;
         }
     }
 
@@ -78,6 +90,10 @@ class DateRange extends Field
 
         if (Arr::has($this->meta, 'single')) {
             $singleField = true;
+        }
+
+        if (!$this->fields_set) {
+            [$this->from_field, $this->till_field] = $this->parseAttribute($attribute);
         }
 
         if ($mode = Arr::get($this->meta, 'modeType')) {
@@ -161,6 +177,7 @@ class DateRange extends Field
     {
         $this->from_field = $from;
         $this->till_field = $till;
+        $this->fields_set = true;
         return $this;
     }
 

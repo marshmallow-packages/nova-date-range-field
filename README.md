@@ -17,6 +17,8 @@ Use DateRange Field class and define the name of the (from & till) fields and th
     public function fields(Request $request)
     {
         return [
+             DateRange::make(__('Access Date'), ['from', 'till'])
+                // OR
              DateRange::make(__('Access Date'))
                 ->fields('from', 'till'),
         ];
