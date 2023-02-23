@@ -59,7 +59,7 @@ class DateRange extends Field
      */
     public function resolveAttribute($resource, $attribute)
     {
-        if (Arr::has($this->meta, 'single')) {
+        if (Arr::has($this->meta, 'modeType') && $this->meta['modeType'] == 'single') {
             return $resource->$attribute;
         }
 
@@ -95,16 +95,16 @@ class DateRange extends Field
         $valid_range = false;
         $singleField = false;
 
-        if (Arr::has($this->meta, 'single')) {
+        if (Arr::has($this->meta, 'modeType') && $this->meta['modeType'] == 'single') {
             $singleField = true;
-        }
-
-        if (!$this->fields_set) {
-            [$this->from_field, $this->till_field] = $this->parseAttribute($attribute);
         }
 
         if ($mode = Arr::get($this->meta, 'modeType')) {
             $singleField = $mode == 'single';
+        }
+
+        if (!$singleField && !$this->fields_set) {
+            [$this->from_field, $this->till_field] = $this->parseAttribute($attribute);
         }
 
         $value = $request->input($requestAttribute) ?: null;
