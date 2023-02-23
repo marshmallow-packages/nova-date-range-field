@@ -59,6 +59,10 @@ class DateRange extends Field
      */
     public function resolveAttribute($resource, $attribute)
     {
+        if (Arr::has($this->meta, 'single')) {
+            return $resource->$attribute;
+        }
+
         if (!$this->fields_set) {
             [$this->from_field, $this->till_field] = $this->parseAttribute($attribute);
         }
