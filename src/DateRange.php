@@ -3,6 +3,7 @@
 namespace Marshmallow\NovaDateRangeField;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 use Laravel\Nova\Fields\Field;
 use Laravel\Nova\Http\Requests\NovaRequest;
@@ -24,15 +25,17 @@ class DateRange extends Field
 
     public $from_field;
     public $till_field;
-    public $options;
+    public $options = [];
 
 
     public function __construct($name, $attribute = null, callable $resolveCallback = null)
     {
         if (is_array($name)) {
+            $this->fields_set = true;
             $name = implode('-', $name);
         }
         if (is_array($attribute)) {
+            $this->fields_set = true;
             $attribute = implode('-', $attribute);
         }
 
@@ -59,12 +62,21 @@ class DateRange extends Field
      */
     public function resolveAttribute($resource, $attribute)
     {
+
+        $singleField = false;
+
         if (Arr::has($this->meta, 'modeType') && $this->meta['modeType'] == 'single') {
-            return $resource->$attribute;
+            $singleField = true;
         }
 
-        if (!$this->fields_set) {
+        if (!$singleField && !is_array($attribute) && !Str::contains($attribute, '-')) {
+            $singleField = true;
+        } elseif (!$this->fields_set) {
             [$this->from_field, $this->till_field] = $this->parseAttribute($attribute);
+        }
+
+        if ($singleField) {
+            return Carbon::parse($resource->$attribute);
         }
 
         $attribute = $attribute ?? $this->attribute;
@@ -191,6 +203,8 @@ class DateRange extends Field
     public function options(array $options)
     {
         $this->options = $options;
+        $this->withMeta(['options' => $options]);
+        return $this;
     }
 
     public function modeType($mode = 'range')

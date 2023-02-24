@@ -1,7 +1,5 @@
 <script>
     import flatpickr from "flatpickr";
-    import "flatpickr/dist/themes/airbnb.css";
-    import { DateTime } from "luxon";
 
     export default {
         props: {
