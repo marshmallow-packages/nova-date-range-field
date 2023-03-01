@@ -71,7 +71,7 @@ class DateRange extends Field
 
         if (!$singleField && !is_array($attribute) && !Str::contains($attribute, '-')) {
             $singleField = true;
-        } elseif (!$this->fields_set) {
+        } elseif (!$this->fields_set || (!$this->from_field && !$this->till_field)) {
             [$this->from_field, $this->till_field] = $this->parseAttribute($attribute);
         }
 
@@ -106,6 +106,7 @@ class DateRange extends Field
     {
         $valid_range = false;
         $singleField = false;
+
 
         if (Arr::has($this->meta, 'modeType') && $this->meta['modeType'] == 'single') {
             $singleField = true;
