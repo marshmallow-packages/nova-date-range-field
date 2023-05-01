@@ -3,7 +3,6 @@
 namespace Marshmallow\NovaDateRangeField;
 
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 use Laravel\Nova\Fields\Field;
 use Laravel\Nova\Http\Requests\NovaRequest;
@@ -39,6 +38,8 @@ class DateRange extends Field
             $attribute = implode('-', $attribute);
         }
 
+        $this->range();
+
         parent::__construct($name, $attribute, $resolveCallback);
     }
 
@@ -69,15 +70,11 @@ class DateRange extends Field
             $singleField = true;
         }
 
-        if (!$singleField && !is_array($attribute) && !Str::contains($attribute, '-')) {
-            $singleField = true;
-        } elseif (!$this->fields_set || (!$this->from_field && !$this->till_field)) {
-            [$this->from_field, $this->till_field] = $this->parseAttribute($attribute);
-        }
-
         if ($singleField) {
             return Carbon::parse($resource->$attribute);
         }
+
+        [$this->from_field, $this->till_field] = $this->parseAttribute($attribute);
 
         $attribute = $attribute ?? $this->attribute;
 
