@@ -6,18 +6,15 @@
         :full-width-content="fullWidthContent"
     >
         <template #field>
-            <date-range-picker
-                class="w-full form-control form-input form-input-bordered"
-                :id="currentField.attribute"
-                :name="currentField.name"
-                :field="currentField"
-                :value="value"
-                @change="handleChange"
-            />
-
-            <p v-if="hasError" class="my-2 text-danger">
-                {{ firstError }}
-            </p>
+                <DateRangePicker
+                    class="w-full flex-1 form-control form-input form-input-bordered"
+                    :id="currentField.uniqueKey"
+                    :dusk="field.attribute"
+                    :name="field.name"
+                    :field="currentField"
+                    :value="value"
+                    @change="handleChange"
+                />
         </template>
     </DefaultField>
 </template>

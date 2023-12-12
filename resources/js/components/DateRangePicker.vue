@@ -22,11 +22,12 @@
                     enableSeconds: this.enableSeconds,
                     dateFormat: this.dateFormat,
                     allowInput: true,
+                    static: true,
                     mode: this.modeType,
                     time_24hr: !this.twelveHourTime,
                     onReady() {
                         self.$refs.dateRangePicker.parentNode.classList.add(
-                            "date-range-filter"
+                            "date-range-field"
                         );
                     },
                     locale: {
@@ -76,7 +77,7 @@
                 return this.field.currentValue || null;
             },
             disabled() {
-                return this.field.disabled;
+                return this.field.disabled || false;
             },
             separator() {
                 return this.field.separator || "-";
