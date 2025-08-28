@@ -3,6 +3,7 @@
 namespace Marshmallow\NovaDateRangeField;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 use Laravel\Nova\Fields\Field;
 use Laravel\Nova\Http\Requests\NovaRequest;
@@ -27,7 +28,7 @@ class DateRange extends Field
     public $options = [];
 
 
-    public function __construct($name, $attribute = null, callable $resolveCallback = null)
+    public function __construct($name, $attribute = null, ?callable $resolveCallback = null)
     {
         if (is_array($name)) {
             $this->fields_set = true;
@@ -37,8 +38,6 @@ class DateRange extends Field
             $this->fields_set = true;
             $attribute = implode('-', $attribute);
         }
-
-        $this->range();
 
         parent::__construct($name, $attribute, $resolveCallback);
     }
@@ -61,7 +60,7 @@ class DateRange extends Field
      * @param  string|null  $attribute
      * @return void
      */
-    public function resolveAttribute($resource, $attribute)
+    public function resolveAttribute($resource, string $attribute): mixed
     {
 
         $singleField = false;
@@ -70,11 +69,15 @@ class DateRange extends Field
             $singleField = true;
         }
 
+        if (!$singleField && !is_array($attribute) && !Str::contains($attribute, '-')) {
+            $singleField = true;
+        } elseif (!$this->fields_set || (!$this->from_field && !$this->till_field)) {
+            [$this->from_field, $this->till_field] = $this->parseAttribute($attribute);
+        }
+
         if ($singleField) {
             return Carbon::parse($resource->$attribute);
         }
-
-        [$this->from_field, $this->till_field] = $this->parseAttribute($attribute);
 
         $attribute = $attribute ?? $this->attribute;
 
@@ -97,6 +100,8 @@ class DateRange extends Field
 
             return $value ?? null;
         }
+
+        return null;
     }
 
     protected function fillAttributeFromRequest(NovaRequest $request, $requestAttribute, $model, $attribute)
